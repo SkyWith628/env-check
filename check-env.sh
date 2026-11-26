@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check-env.sh — 작업환경 점검 (읽기 전용 · Mac / Windows(Git Bash) / Linux 공용)
 #
-# 하는 일 : 이 기기의 클라우드 폴더 · git 레포 · AI 환경(Claude/Codex)을 훑어 마크다운 보고서를 만든다.
+# 하는 일 : 이 기기의 클라우드 폴더 · git 레포 · AI 환경(Claude)을 훑어 마크다운 보고서를 만든다.
 # 안 하는 일: 파일 수정/삭제/이동, push/pull/commit, 비밀 내용 출력(파일 경로만 표시).
 #             (git status 는 --no-optional-locks 로 실행. 쓰기는 결과 파일과 임시 폴더뿐)
 #
@@ -227,8 +227,6 @@ repo_info() { # $1=경로 $2=번호
   fi
   bad="$(git -C "$d" for-each-ref 2>&1 >/dev/null | grep -ciE 'broken ref|bad object|missing object')"
   [ "${bad:-0}" -gt 0 ] && note="${note}ref손상;"
-  cx="$(git -C "$d" for-each-ref --format='%(refname)' 'refs/codex/*' 2>/dev/null | wc -l | tr -d ' ')"
-  [ "${cx:-0}" -gt 0 ] && note="${note}codex-refs${cx};"
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
     "$d" "$cloud" "$br" "$url" "${dirty:--}" "${ahead:--}" "$behind" "$hasup" "$cmp" "${last:--}" "${note:--}" "${real:-0}" "${del:-0}" > "$RDIR/$n.tsv"
 }
@@ -326,12 +324,12 @@ while IFS= read -r f; do
 done < "$TMP/secrets.txt"
 if [ -s "$TMP/s_list.txt" ]; then head -40 "$TMP/s_list.txt" >> "$CUR"; else p "- 없음"; fi
 
-# ── 7. AI 환경 (Claude / Codex) ─────────────────────────────────────
+# ── 7. AI 환경 (Claude Code) ─────────────────────────────────────
 say "[6/6] AI 환경 확인..."
 sec 70
-p "## 7. AI 환경 (Claude Code / Codex)"
+p "## 7. AI 환경 (Claude Code)"
 p "- claude: $(command -v claude 2>/dev/null || echo '없음') $(to 15 claude --version 2>/dev/null | head -1)"
-p "- 환경변수: CLAUDE_CONFIG_DIR=${CLAUDE_CONFIG_DIR:-(없음)} / CODEX_HOME=${CODEX_HOME:-(없음)} / WORK_ROOT=${WORK_ROOT:-(없음)}"
+p "- 환경변수: CLAUDE_CONFIG_DIR=${CLAUDE_CONFIG_DIR:-(없음)} / WORK_ROOT=${WORK_ROOT:-(없음)}"
 CMD="$HOME/.claude/CLAUDE.md"
 if [ -f "$CMD" ]; then p "- ~/.claude/CLAUDE.md: 있음 ($(wc -l < "$CMD" | tr -d ' ')줄, md5 $(md5of "$CMD"), 첫 줄: $(head -1 "$CMD" | cut -c1-60))"; else p "- ~/.claude/CLAUDE.md: 없음"; fi
 if [ -f "$HOME/.claude/settings.json" ]; then
@@ -356,14 +354,13 @@ if [ -d "$HOME/.claude/projects" ]; then
   ls -A "$HOME/.claude/projects" 2>/dev/null | head -40 | while IFS= read -r x; do p "  - $x"; done
   p "- 메모리 파일 수: $(ls "$HOME"/.claude/projects/*/memory/*.md 2>/dev/null | wc -l | tr -d ' ')개"
 fi
-if [ -d "$HOME/.codex" ]; then p "- ~/.codex: 있음 (AGENTS.md md5: $(md5of "$HOME/.codex/AGENTS.md"))"; else p "- ~/.codex: 없음"; fi
 
 # ── 8. USB / 구 환경 흔적 ───────────────────────────────────────────
 sec 80
 p "## 8. USB · 구 환경 흔적"
 usb=0
 if [ "$OS" = mac ] && [ -d /Volumes ]; then p "- /Volumes: $(ls /Volumes 2>/dev/null | tr '\n' ',' | sed 's/,$//')"; fi
-if [ -n "${WORK_ROOT:-}${CLAUDE_CONFIG_DIR:-}${CODEX_HOME:-}" ]; then usb=1; p "- 🟡 USB용 환경변수가 설정돼 있음 (env.sh 흔적)"; fi
+if [ -n "${WORK_ROOT:-}${CLAUDE_CONFIG_DIR:-}" ]; then usb=1; p "- 🟡 USB용 환경변수가 설정돼 있음 (env.sh 흔적)"; fi
 for r in "${CLOUD_ROOTS[@]}"; do
   hit="$(to 30 find -H "$r" -maxdepth 3 \( -name 'WorkSpace_M' -o -name '_global' -o -name 'env.sh' -o -name 'bootstrap.sh' \) 2>/dev/null | head -5)"
   if [ -n "$hit" ]; then usb=1; printf '%s\n' "$hit" | while IFS= read -r h; do p "- 🟡 구 환경 파일/폴더: $(tilde "$h")"; done; fi
