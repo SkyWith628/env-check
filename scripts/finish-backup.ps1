@@ -30,15 +30,16 @@ if (-not $SkipCopy) {
   W '복사 시작 (증분)'
   $log = Join-Path $LogDir ('robocopy-' + (Get-Date -Format 'yyyyMMdd-HHmm') + '.log')
   # cosmetic-agent: 사용자가 백업 불필요로 결정(2026-11-27) → 복사 대상에서 제외
-  robocopy $Src $Dst /E /COPY:DAT /DCOPY:DAT /R:3 /W:10 /MT:2 /XJ `
-    /XD node_modules .venv venv .next __pycache__ (Join-Path $Src 'WorkSpace\claude\cosmetic-agent') `
+  # 재시도는 1회×1초: 클라우드에서 내려받지 못하는 파일에 3회×10초를 쓰면 수천 개 폴더에서 몇 시간이 걸린다(11-27 경험)
+  robocopy $Src $Dst /E /COPY:DAT /DCOPY:DAT /R:1 /W:1 /MT:2 /XJ `
+    /XD node_modules .venv .venv-win venv .next __pycache__ Library vendor Apache24 (Join-Path $Src 'WorkSpace\claude\cosmetic-agent') `
     /XF desktop.ini $internal /NP /NDL /UNILOG:$log | Out-Null
   $rc = $LASTEXITCODE
   $e = (Select-String -Path $log -Pattern 'ERROR 389' -Encoding Unicode -ErrorAction SilentlyContinue | Measure-Object).Count
   W "복사 종료 exit=$rc (0~7 정상, 8 이상 오류), 클라우드 오류(0x185) ${e}건, 로그 $log"
 }
 
-$exDirs = @('node_modules', '.venv', 'venv', '.next', '__pycache__')
+$exDirs = @('node_modules', '.venv', '.venv-win', 'venv', '.next', '__pycache__', 'Library', 'vendor', 'Apache24')   # 모두 다시 설치·생성되는 것(Library=Unity 캐시, vendor=Composer, Apache24=APM 배포본)
 $exFiles = @('desktop.ini', $internal)
 function Get-AllFiles($root) {
   $stack = [System.Collections.Generic.Stack[string]]::new(); $stack.Push($root)
@@ -85,7 +86,7 @@ $readme = @"
 백업 일시 : $(Get-Date -Format 'yyyy-MM-dd HH:mm')
 원본      : $Src
 복사 도구 : robocopy /E (증분, 여러 번 실행)
-제외 항목 : node_modules, .venv, venv, .next, __pycache__ 폴더, desktop.ini, OneDrive 내부 파일, WorkSpace\claude\cosmetic-agent (사용자 결정: 백업 불필요)
+제외 항목 : node_modules, .venv, .venv-win, venv, .next, __pycache__, Library(Unity 캐시), vendor(Composer), Apache24(APM 배포본) 폴더, desktop.ini, OneDrive 내부 파일, WorkSpace\claude\cosmetic-agent (사용자 결정: 백업 불필요). 앞선 복사 때 이미 들어간 해당 폴더의 파일은 남아 있을 수 있음
 파일 수   : 원본 $($srcMap.Count) / 백업 $($dstMap.Count)
 누락      : 합계 $($missing.Count)개 = Unity Library 캐시 $($mLib.Count) + cosmetic-agent $($mCos.Count) + oblige(GitHub에 있음) $($mObl.Count) + 그 밖 $($mReal.Count)
 크기 불일치: $($mismatch.Count)개
