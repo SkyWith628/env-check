@@ -10,6 +10,7 @@
 #   --fetch             git fetch 실행 (원격 추적 브랜치만 갱신, '뒤처짐' 수를 정확히 계산)
 #   --roots "경로:경로"  추가로 훑을 폴더 (Windows Git Bash는 /c/Users/... 형식)
 #   --out 폴더          결과 저장 폴더 (기본: 이 스크립트 옆 '결과/')
+#   --name 이름         결과 파일명·제목에 쓸 기기 이름 (영문 권장. 호스트 이름이 한글이면 지정)
 #
 # 결과: <결과폴더>/<호스트>-<날짜-시각>.md  (기기마다 파일명이 달라 3대 동시 실행해도 충돌 없음)
 VERSION="1.0"
@@ -25,6 +26,7 @@ while [ $# -gt 0 ]; do
     --fetch)  DO_FETCH=1 ;;
     --roots)  shift; EXTRA_ROOTS="${1:-}" ;;
     --out)    shift; OUT_DIR="${1:-$OUT_DIR}" ;;
+    --name)   shift; HOST_OVERRIDE="${1:-}" ;;
     -h|--help) sed -n '2,17p' "$0"; exit 0 ;;
     *) echo "알 수 없는 옵션: $1" >&2; exit 2 ;;
   esac
@@ -79,7 +81,10 @@ HOST=""
 if [ "$OS" = mac ] && command -v scutil >/dev/null 2>&1; then HOST="$(scutil --get LocalHostName 2>/dev/null)"; fi
 [ -z "$HOST" ] && HOST="$(hostname 2>/dev/null | cut -d. -f1)"
 [ -z "$HOST" ] && HOST="unknown"
+[ -n "${HOST_OVERRIDE:-}" ] && HOST="$HOST_OVERRIDE"
 SAFE_HOST="$(printf '%s' "$HOST" | tr -c 'A-Za-z0-9_-' '_')"
+# 한글 호스트 이름이면 파일명이 '____'가 되므로 --name 이 없을 때는 pc 로 대체한다
+[ -z "$(printf '%s' "$SAFE_HOST" | tr -d '_-')" ] && SAFE_HOST="pc"
 STAMP="$(date +%Y%m%d-%H%M)"
 OUT="$OUT_DIR/${SAFE_HOST}-${STAMP}.md"
 
