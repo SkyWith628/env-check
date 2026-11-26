@@ -1,0 +1,33 @@
+# 맥북 10월 복사본에만 있고 USB 백업에 없는 파일 (경로 크기)
+# 데스크탑 비교 결과, 2026-11-27. .DS_Store 제외 31개
+1454187  claude/KU_8/강의자료/01_파이썬과_데이터분석/#3_데이터 분석을 위한 준비.pdf
+1716867  claude/KU_8/강의자료/01_파이썬과_데이터분석/#4_데이터 전처리.pdf
+18661627  claude/KU_8/강의자료/교재_K8s.pdf
+18738083  claude/KU_8/강의자료/교재_LLM.pdf
+13777292  claude/KU_8/강의자료/교재_MCP.pdf
+459127  claude/KU_8/발표자료/밥_5조/밥 5조 발표자료.pdf
+41645  claude/KU_8/발표자료/밥_5조/밥 5조 발표자료.pptx
+477399  claude/KU_8/발표자료/SafeCross/SafeCross_발표자료.pdf
+487411  claude/KU_8/실습/#3_데이터 시각화_실습자료/10_데이터시각화_wine.ipynb
+183298  claude/KU_8/실습/#3_데이터 시각화_실습자료/8_데이터시각화_matplotlib과_seaborn_라이브러리.ipynb
+657319  claude/KU_8/실습/#3_데이터 시각화_실습자료/9_데이터시각화_titanic.ipynb
+57910  claude/KU_8/실습/#3_데이터 시각화_실습자료/titanic.csv
+421528  claude/KU_8/실습/#3_데이터 시각화_실습자료/wine.csv
+84199  claude/KU_8/실습/#3_데이터 시각화_실습자료/winequality-red.csv
+93599  claude/KU_8/실습/#3_데이터 시각화_실습자료/winequality-red2.csv
+264426  claude/KU_8/실습/#3_데이터 시각화_실습자료/winequality-white.csv
+292287  claude/KU_8/실습/#3_데이터 시각화_실습자료/winequality-white2.csv
+27662  claude/KU_8/실습/#4_데이터 전처리_실습자료/1_데이터_이해하기_판다스.ipynb
+31780  claude/KU_8/실습/#4_데이터 전처리_실습자료/2_데이터_불러오는_방법.ipynb
+102405  claude/KU_8/실습/#4_데이터 전처리_실습자료/3_데이터_기본_정보.ipynb
+59106  claude/KU_8/실습/#4_데이터 전처리_실습자료/4_데이터_선택하기.ipynb
+127787  claude/KU_8/실습/#4_데이터 전처리_실습자료/5_데이터_처리하기.ipynb
+62853  claude/KU_8/실습/#4_데이터 전처리_실습자료/6_결측값과_중복값_처리.ipynb
+155344  claude/KU_8/실습/#4_데이터 전처리_실습자료/7_문자_데이터_처리.ipynb
+1157  claude/KU_8/실습/#4_데이터 전처리_실습자료/brand_ad_ex.csv
+1318  claude/KU_8/실습/#4_데이터 전처리_실습자료/brand_ad_ex2.csv
+29923  claude/KU_8/프로젝트/CareNote/carenote-learning-roadmap-v1.html
+49261  claude/KU_8/프로젝트/CareNote/carenote-learning-roadmap.html
+52308  claude/KU_8/프로젝트/CareNote/carenote-portfolio-blueprint-v2.html
+22101  claude/KU_8/프로젝트/CareNote/carenote-week01-session01.html
+76014  claude/KU_8/프로젝트/CareNote/carenote-weekly-dashboard.html
