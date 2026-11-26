@@ -183,7 +183,7 @@ fi
 say "[3/6] git 레포 상태 확인 ($(wc -l < "$TMP/repopaths.txt" | tr -d ' ')개)..."
 RDIR="$TMP/repos"; mkdir -p "$RDIR"
 repo_info() { # $1=경로 $2=번호
-  local d="$1" n="$2" cloud=N note="" br url up dirty ahead behind hasup cmp last loc rem rc bad cx
+  local d="$1" n="$2" cloud=N note="" br url up dirty ahead behind hasup cmp last loc rem rc bad cx st untr del real
   in_cloud "$d" && cloud=Y
   [ -f "$d/.git" ] && note="worktree/submodule;"
   br="$(git -C "$d" branch --show-current 2>/dev/null)"; [ -z "$br" ] && br="(detached)"
@@ -192,7 +192,13 @@ repo_info() { # $1=경로 $2=번호
     to 60 git -c gc.auto=0 -c maintenance.auto=0 -C "$d" fetch --quiet origin >/dev/null 2>&1
   fi
   up="$(git -C "$d" rev-parse --abbrev-ref '@{u}' 2>/dev/null)"
-  dirty="$(to 30 git --no-optional-locks -C "$d" status --short 2>/dev/null | wc -l | tr -d ' ')"
+  st="$(to 30 git --no-optional-locks -C "$d" status --short 2>/dev/null)"
+  dirty="$(printf '%s\n' "$st" | grep -c .)"
+  untr="$(printf '%s\n' "$st" | grep -c '^??')"
+  del="$(printf '%s\n' "$st" | grep -cE '^( D|D )')"
+  # 줄바꿈(CRLF)만 다른 변경은 제외한 '실제 내용 변경' 파일 수 + 미추적 파일 수
+  real="$(to 60 git --no-optional-locks -C "$d" diff --ignore-space-at-eol --numstat 2>/dev/null | awk '$1=="-" || ($1+$2)>0' | wc -l | tr -d ' ')"
+  real=$(( ${real:-0} + ${untr:-0} ))
   last="$(git -C "$d" log -1 --format=%cs 2>/dev/null)"
   if [ -n "$up" ]; then
     hasup=Y
@@ -218,8 +224,8 @@ repo_info() { # $1=경로 $2=번호
   [ "${bad:-0}" -gt 0 ] && note="${note}ref손상;"
   cx="$(git -C "$d" for-each-ref --format='%(refname)' 'refs/codex/*' 2>/dev/null | wc -l | tr -d ' ')"
   [ "${cx:-0}" -gt 0 ] && note="${note}codex-refs${cx};"
-  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-    "$d" "$cloud" "$br" "$url" "${dirty:--}" "${ahead:--}" "$behind" "$hasup" "$cmp" "${last:--}" "${note:--}" > "$RDIR/$n.tsv"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$d" "$cloud" "$br" "$url" "${dirty:--}" "${ahead:--}" "$behind" "$hasup" "$cmp" "${last:--}" "${note:--}" "${real:-0}" "${del:-0}" > "$RDIR/$n.tsv"
 }
 n=0
 while IFS= read -r d; do
@@ -234,12 +240,13 @@ cat "$RDIR"/*.tsv 2>/dev/null | sort > "$TMP/all.tsv"
 sec 30
 p "## 3. git 레포 (${n}개)"
 p ""
-p "- 미커밋 = git status 변경 수 / 로컬에만 = 원격 어디에도 없는 커밋 수 / 뒤처짐 = ?는 확인 안 함(--fetch 때만 계산) / 원격HEAD = GitHub 같은 브랜치 HEAD와 비교"
+p "- 미커밋 = git status 변경 수 / 실제변경 = 줄바꿈(CRLF)만 다른 파일을 뺀 내용 변경 + 미추적 파일 수 / 삭제표시 = 작업 폴더에서 사라진 추적 파일 수(클라우드 미다운로드일 수 있음) / 로컬에만 = 원격 어디에도 없는 커밋 수 / 뒤처짐 = ?는 확인 안 함(--fetch 때만 계산) / 원격HEAD = GitHub 같은 브랜치 HEAD와 비교"
+p "- 미커밋이 큰데 실제변경이 0이면 줄바꿈·미다운로드 때문에 부풀려진 숫자입니다(Windows는 줄바꿈 때문에 자주 발생)."
 p ""
-p "| 경로 | 클라우드 | 브랜치 | 원격 | 미커밋 | 로컬에만 | 뒤처짐 | 업스트림 | 원격HEAD | 마지막커밋 | 비고 |"
-p "|---|---|---|---|---|---|---|---|---|---|---|"
-while IFS=$'\t' read -r path cloud br url dirty ahead behind hasup cmp last note; do
-  p "| $(tilde "$path") | $cloud | $br | $url | $dirty | $ahead | $behind | $hasup | $cmp | $last | $note |"
+p "| 경로 | 클라우드 | 브랜치 | 원격 | 미커밋 | 실제변경 | 삭제표시 | 로컬에만 | 뒤처짐 | 업스트림 | 원격HEAD | 마지막커밋 | 비고 |"
+p "|---|---|---|---|---|---|---|---|---|---|---|---|---|"
+while IFS=$'\t' read -r path cloud br url dirty ahead behind hasup cmp last note real del; do
+  p "| $(tilde "$path") | $cloud | $br | $url | $dirty | ${real:-0} | ${del:-0} | $ahead | $behind | $hasup | $cmp | $last | $note |"
 done < "$TMP/all.tsv"
 
 # ── 4. 같은 원격을 가리키는 중복 폴더 ───────────────────────────────
@@ -364,7 +371,8 @@ total="$(grep -c . "$TMP/all.tsv" 2>/dev/null)"; total="${total:-0}"
 incloud="$(awk -F'\t' '$2=="Y"' "$TMP/all.tsv" | grep -c .)"
 noup="$(awk -F'\t' '$8=="N"' "$TMP/all.tsv" | grep -c .)"
 unpushed="$(awk -F'\t' '$6+0>0' "$TMP/all.tsv" | grep -c .)"
-dirtyc="$(awk -F'\t' '$5+0>0' "$TMP/all.tsv" | grep -c .)"
+dirtyc="$(awk -F'\t' '$12+0>0' "$TMP/all.tsv" | grep -c .)"
+noisy="$(awk -F'\t' '$5+0>0 && $12+0==0' "$TMP/all.tsv" | grep -c .)"
 differ="$(awk -F'\t' '$9=="다름"' "$TMP/all.tsv" | grep -c .)"
 badref="$(awk -F'\t' '$11 ~ /ref손상/' "$TMP/all.tsv" | grep -c .)"
 p "## 0. 요약 (자동 판정)"
@@ -375,7 +383,8 @@ p "| ℹ️ | git 레포 수 | ${total} |"
 p "| $([ "${incloud:-0}" -gt 0 ] && echo 🔴 || echo 🟢) | 클라우드 동기화 폴더 안에 있는 레포 | ${incloud:-0} |"
 p "| $([ "${noup:-0}" -gt 0 ] && echo 🔴 || echo 🟢) | 업스트림 없는 브랜치 (로컬 전용일 수 있음) | ${noup:-0} |"
 p "| $([ "${unpushed:-0}" -gt 0 ] && echo 🔴 || echo 🟢) | 원격에 없는 커밋이 있는 레포 | ${unpushed:-0} |"
-p "| $([ "${dirtyc:-0}" -gt 0 ] && echo 🟡 || echo 🟢) | 미커밋 변경이 있는 레포 | ${dirtyc:-0} |"
+p "| $([ "${dirtyc:-0}" -gt 0 ] && echo 🟡 || echo 🟢) | 실제 내용 변경(줄바꿈 제외)·미추적 파일이 있는 레포 | ${dirtyc:-0} |"
+p "| ℹ️ | 줄바꿈·미다운로드 때문에 미커밋이 부풀려진 레포 (미커밋>0, 실제변경 0) | ${noisy:-0} |"
 p "| $([ "${differ:-0}" -gt 0 ] && echo 🟡 || echo 🟢) | GitHub와 HEAD가 다른 레포 (뒤처짐/앞섬) | ${differ:-0} |"
 p "| $([ "${badref:-0}" -gt 0 ] && echo 🔴 || echo 🟢) | git ref 손상 레포 | ${badref:-0} |"
 p "| $([ "${s_cloud:-0}" -gt 0 ] && echo 🔴 || echo 🟢) | 클라우드 안 비밀정보 의심 파일 | ${s_cloud:-0} |"
