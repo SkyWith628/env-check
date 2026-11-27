@@ -67,3 +67,9 @@
 ## 8. 하지 않은 것
 - 10월 복사본 삭제 — 데스크탑의 USB 백업 + 파일 목록 대조 결과를 기다림
 - OneDrive 중단, iCloud 안 이동·삭제·이름 변경
+
+## 9. 추가 (11-27, 데스크탑 대조 결과 반영) — 맥북-작업지시 5번
+- **공개 레포 브랜치 사고 확인**: 맥북이 push한 `backup/mac-oct-copy` 7개·`wip/carenote-20261127`은 데스크탑이 삭제했고, 맥북에서 `git ls-remote`로 7개 레포 모두 backup·wip 브랜치 0개를 확인. push 전 공개 여부를 확인하지 않은 것은 맥북 쪽 누락. 내용은 `~/dev/_backup/macbook-oct-copy-20261127/`·10월 복사본·iCloud carenote-ai 작업 폴더에 남아 있어 손실 없음.
+- **KU_8 31개 복사**: iCloud `강의자료/KU_8-맥북복사본/`(새 폴더, `WorkSpace_M` 밖)에 `claude/KU_8/` 아래 구조를 유지해 복사. **31개 모두 크기가 목록과 같고 원본과 바이트 단위로 동일**(`cmp`). 합계 56MB. 원본은 그대로 둠.
+- **carenote-ai 태그 4개 push**: `golden-v2-final-plan`, `golden-v2-frozen`, `golden-v2-test-reported`, `sentinel-rules-v2` (레포 PUBLIC 확인. 4개 모두 이미 공개된 `origin/v2`에 포함된 커밋을 가리켜서 새로 공개되는 코드는 없음. 주석 태그라 태그 메시지는 공개됨). iCloud 사본 삭제 조건 충족.
+- **남은 것**: 10월 복사본 삭제(2번)는 사용자 확인 후. 그 다음 [플러그인-설치-지침.md](../플러그인-설치-지침.md).
