@@ -73,3 +73,10 @@
 - **KU_8 31개 복사**: iCloud `강의자료/KU_8-맥북복사본/`(새 폴더, `WorkSpace_M` 밖)에 `claude/KU_8/` 아래 구조를 유지해 복사. **31개 모두 크기가 목록과 같고 원본과 바이트 단위로 동일**(`cmp`). 합계 56MB. 원본은 그대로 둠.
 - **carenote-ai 태그 4개 push**: `golden-v2-final-plan`, `golden-v2-frozen`, `golden-v2-test-reported`, `sentinel-rules-v2` (레포 PUBLIC 확인. 4개 모두 이미 공개된 `origin/v2`에 포함된 커밋을 가리켜서 새로 공개되는 코드는 없음. 주석 태그라 태그 메시지는 공개됨). iCloud 사본 삭제 조건 충족.
 - **남은 것**: 10월 복사본 삭제(2번)는 사용자 확인 후. 그 다음 [플러그인-설치-지침.md](../플러그인-설치-지침.md).
+
+## 10. 10월 복사본 삭제 (맥북-작업지시 2번) — 2026-11-27 09:04
+- 사용자 확인 후 `mv "~/Library/CloudStorage/OneDrive-인덕대학교 (2026. 10. 22. 오전 9:30)" ~/.Trash/OneDrive-old-20261022` — **성공**(오류 없음). 영구 삭제 아님.
+- 크기 24GB. 휴지통에 있는 동안은 디스크 여유 공간 변화 없음(102GiB → 102GiB). 휴지통을 비우면 약 24GB 확보.
+- 현재 OneDrive(`~/Library/CloudStorage/OneDrive-인덕대학교`)와 링크 `~/OneDrive - 인덕대학교`는 그대로.
+- 남은 연결: 복사본의 `케어노트AI`가 쓰던 git 디렉터리 `~/.gitdirs/carenote-ai.git`(로컬)은 남아 있음. 복사본을 휴지통에서 비운 뒤 정리 대상.
+- 휴지통은 7일 뒤 문제가 없으면 사용자가 직접 비움.
