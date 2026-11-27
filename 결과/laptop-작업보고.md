@@ -8,6 +8,7 @@
 - 내용: 미추적 파일 `scripts/kakao_replay.py`(7KB) 1개. 대본(`HH:MM:SS|화자|본문`)을 PC 카카오톡 채팅창에 시각 맞춰 보내는 Windows 전용 스크립트. 비밀정보로 보이는 문자열 없음.
 - **브랜치 `feat/kakao-replay`로 push**(커밋 `4191104`). 지시서의 브랜치 이름 `wip/persona-laptop-20261127`과 다릅니다(지시서 전에 올림). PR은 만들지 않았습니다.
 - 그 뒤 로컬 `main`을 GitHub에 맞춤(`fbd5221` → `d8bf96b`, fast-forward). 지금 `persona-ize`는 미커밋 0입니다.
+- **추가(11-27, 인수인계 1번 결정): GitHub의 `feat/kakao-replay` 브랜치를 삭제했습니다.** `persona-ize`가 PUBLIC 레포인데 푸시 전에 공개 여부를 확인하지 않은 실수였습니다. 삭제 후 `ls-remote`로 원격에 없는 것을 확인했습니다. 스크립트는 노트북 로컬 브랜치 `feat/kakao-replay`(커밋 `4191104`)에 남아 있습니다.
 
 ### 1-2. iCloud `projects/MINI`, `projects/mini(1)` — 읽기만 함
 | 폴더 | `.env` | `.venv` | 그 밖 | git 상태 |
@@ -48,6 +49,6 @@
 
 ## 4. 데스크탑에 전할 것
 1. `carenote-ai` 태그 4개가 GitHub에 없음 → 맥북(담당)에서 `git push origin --tags` 후 iCloud 사본 정리.
-2. 노트북 `persona-ize` 브랜치 이름은 `feat/kakao-replay`(지시서의 `wip/…`가 아님).
+2. 노트북 `persona-ize` 브랜치 `feat/kakao-replay`는 **GitHub에서 삭제함**(공개 레포). 로컬에만 보존.
 3. `MINI`·`mini(1)`·`1`은 지킬 것이 `.env`·`monitor.db`뿐이고 이미 `~/dev`에 복사함 → 세 기기 확인 후 정리할 때 노트북 쪽은 준비 완료.
 4. `workenv` 설치 스크립트: Windows에서 `rsync` 없이 동작하게, USB 경로 가정(`../projects`) 제거.
