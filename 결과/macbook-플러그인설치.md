@@ -36,9 +36,12 @@
 | 설치된 훅 직접 실행 (`~/.claude/plugins/cache/skywith-local/skywith/d8ce19b45b28/hooks/print-rules.js`) | ✅ `SessionStart` 출력, 1,236자, 첫 줄 `# 전역 규칙 v4.1` |
 | 플러그인 스킬 | ✅ agent-dashboard, ai-ml, blog, deploy, dgaja, llm-agent, portfolio, project-init, shimai, study, work (11개) |
 | 이중 주입 원인 | ✅ `~/.claude/CLAUDE.md` 없음, 겹치는 로컬 스킬 0 |
-| `claude -p`로 새 세션 검증 (빈 폴더) | ⚠️ **실행 못 함** — CLI 인증 만료: `Failed to authenticate: OAuth session expired and could not be refreshed` |
-| `HANDOFF_DIR` | ⚠️ settings.json에는 들어감. 새 세션에서 `echo $HANDOFF_DIR` 확인은 위 인증 문제로 못 함 |
+| `claude -p`로 새 세션 검증 (빈 폴더) | ✅ `v4.1` (처음엔 CLI 인증 만료로 실패 → 사용자 `/login` 후 재실행) |
+| 이중 주입 | ✅ "1벌, v4.1 (SessionStart 훅으로 들어온 것 한 번뿐)" |
+| 스킬 | ✅ `skywith:` 11개 + 로컬 `court`, 이름 겹침 없음 |
+| `HANDOFF_DIR` | ✅ 새 세션에서 `/Users/sktwith/Library/Mobile Documents/com~apple~CloudDocs/_handoff` |
 
 ## 5. 막힌 점 / 사용자에게 물을 것
-- 터미널에서 `claude` 실행 → `/login`으로 CLI 재로그인 필요(사용자가 직접). 그 뒤 4번 검증(`claude -p` 버전 `v4.1`, 이중 주입 없음, `HANDOFF_DIR`)을 다시 돌림.
-- 이 설치를 진행한 데스크톱 앱 세션은 시작 시 옛 규칙(v4.0)을 이미 불러온 상태라, 앱에서도 **새 세션**을 열어야 v4.1이 적용됨.
+- 없음. CLI 재로그인 후 4번 검증 전부 통과.
+- 설치를 진행한 앱 세션은 옛 규칙(v4.0)을 이미 불러온 상태였으므로, 앱에서도 새 세션부터 v4.1이 적용됨.
+- 옛 사본(`~/.claude/CLAUDE.md.bak-20261127`, `~/.claude/skills-backup/`)은 그대로 보관 중. 문제없으면 나중에 정리.
